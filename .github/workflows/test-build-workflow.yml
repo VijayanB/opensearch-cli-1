@@ -11,7 +11,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: Set up Go ubuntu-latest
         uses: actions/setup-go@v2
@@ -54,7 +54,6 @@ jobs:
       - name: Run Docker Image
         run: |
           make docker.start.components
-          sleep 60
 
       - name: Run Integration Tests
         env:
