@@ -265,33 +265,36 @@ func (a *ADTestSuite) TestStartDetectors() {
 		assert.NoError(t, err, "failed to start detectors")
 	})
 }
-func (a *ADTestSuite) TestDeleteDetectorsForce() {
-	a.T().Run("delete force success", func(t *testing.T) {
-		a.StartDetectorUsingRESTAPI(t, a.DetectorId)
-		ctx := context.Background()
-		var stdin bytes.Buffer
-		stdin.Write([]byte("yes\n"))
-		ctrl := adctrl.New(&stdin, a.ESController, a.ADGateway)
-		err := ctrl.DeleteDetectorByName(ctx, a.Detector.Name, true, false)
-		assert.NoError(t, err, "failed to delete detectors")
-	})
-}
 
-func (a *ADTestSuite) TestDeleteDetectors() {
-	a.T().Run("delete stopped success", func(t *testing.T) {
-		ctx := context.Background()
-		var stdin bytes.Buffer
-		stdin.Write([]byte("yes\n"))
-		ctrl := adctrl.New(&stdin, a.ESController, a.ADGateway)
-		err := ctrl.DeleteDetectorByName(ctx, a.Detector.Name, false, false)
-		assert.NoError(t, err, "failed to delete detectors")
-	})
-}
+//func (a *ADTestSuite) TestDeleteDetectorsForce() {
+//	a.T().Run("delete force success", func(t *testing.T) {
+//		a.StartDetectorUsingRESTAPI(t, a.DetectorId)
+//		ctx := context.Background()
+//		var stdin bytes.Buffer
+//		stdin.Write([]byte("yes\n"))
+//		ctrl := adctrl.New(&stdin, a.ESController, a.ADGateway)
+//		err := ctrl.DeleteDetectorByName(ctx, a.Detector.Name, true, false)
+//		assert.NoError(t, err, "failed to delete detectors")
+//	})
+//}
+
+//func (a *ADTestSuite) TestDeleteDetectors() {
+//	a.T().Run("delete stopped success", func(t *testing.T) {
+//		ctx := context.Background()
+//		var stdin bytes.Buffer
+//		stdin.Write([]byte("yes\n"))
+//		ctrl := adctrl.New(&stdin, a.ESController, a.ADGateway)
+//		err := ctrl.DeleteDetectorByName(ctx, a.Detector.Name, false, false)
+//		assert.NoError(t, err, "failed to delete detectors")
+//	})
+//}
 
 func (a *ADTestSuite) TestGetDetectors() {
 	a.T().Run("get detector success", func(t *testing.T) {
 		ctx := context.Background()
-		ctrl := adctrl.New(os.Stdin, a.ESController, a.ADGateway)
+		var stdin bytes.Buffer
+		stdin.Write([]byte("yes\n"))
+		ctrl := adctrl.New(&stdin, a.ESController, a.ADGateway)
 		output, err := ctrl.GetDetectorsByName(ctx, a.Detector.Name, false)
 		assert.NoError(t, err, "failed to get detectors")
 		assert.EqualValues(t, 1, len(output))
