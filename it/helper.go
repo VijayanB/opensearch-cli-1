@@ -13,7 +13,6 @@ package it
 
 import (
 	"bytes"
-	"strings"
 	"context"
 	"fmt"
 	"io/ioutil"
@@ -23,9 +22,15 @@ import (
 	"opensearch-cli/environment"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/stretchr/testify/suite"
+)
+
+const (
+	newLine           = "\n"
+	getPluginNamesURL = "_cat/plugins?h=c"
 )
 
 type CLISuite struct {
@@ -114,23 +119,23 @@ func (a *CLISuite) callRequest(method string, reqBytes []byte, url string) ([]by
 	return ioutil.ReadAll(response.Body)
 }
 
-func (a *CLISuite) isPluginInstalled()(bool, error){
-	pluginListsInBytes, err := a.callRequest(http.MethodGet, []byte(""), fmt.Sprintf("%s/_cat/plugins?h=c", a.Profile.Endpoint))
+func (a *CLISuite) isPluginInstalled() bool {
+	pluginListsInBytes, err := a.callRequest(http.MethodGet, []byte(""), fmt.Sprintf("%s/%s", a.Profile.Endpoint, getPluginNamesURL))
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 	pluginListsAsString := string(pluginListsInBytes[:])
-	pluginArray := strings.Split(pluginListsAsString, "\n")
+	pluginArray := strings.Split(pluginListsAsString, newLine)
 	for _, plugin := range a.Plugins {
-		if (!contains(pluginArray, plugin)) {
-			return false, nil
+		if contains(pluginArray, plugin) == false {
+			return false
 		}
 	}
-	return true, nil
+	return true
 }
 
-func contains(container []string, value string) (bool){
+func contains(container []string, value string) bool {
 	for _, item := range container {
 		if item == value {
 			return true
