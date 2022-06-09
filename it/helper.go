@@ -13,6 +13,7 @@ package it
 
 import (
 	"bytes"
+	"strings"
 	"context"
 	"fmt"
 	"io/ioutil"
@@ -31,6 +32,7 @@ type CLISuite struct {
 	suite.Suite
 	Client  *client.Client
 	Profile *entity.Profile
+	Plugins []string
 }
 
 //HelperLoadBytes loads file from testdata and stream contents
@@ -110,4 +112,29 @@ func (a *CLISuite) callRequest(method string, reqBytes []byte, url string) ([]by
 		}
 	}()
 	return ioutil.ReadAll(response.Body)
+}
+
+func (a *CLISuite) isPluginInstalled()(bool, error){
+	pluginListsInBytes, err := a.callRequest(http.MethodGet, []byte(""), fmt.Sprintf("%s/_cat/plugins?h=c", a.Profile.Endpoint))
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	pluginListsAsString := string(pluginListsInBytes[:])
+	pluginArray := strings.Split(pluginListsAsString, "\n")
+	for _, plugin := range a.Plugins {
+		if (!contains(pluginArray, plugin)) {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
+func contains(container []string, value string) (bool){
+	for _, item := range container {
+		if item == value {
+			return true
+		}
+	}
+	return false
 }
