@@ -123,6 +123,10 @@ func (a *OpenSearchTestSuite) TestCurlGet() {
 }
 
 func (a *OpenSearchTestSuite) TestCurlPatch() {
+	plugins := []string{"opensearch-security"}
+	if !a.IsPluginFromInputInstalled(plugins) {
+		a.T().Skipf("plugin %s is not installed", plugins)
+	}
 	request := platform.CurlCommandRequest{
 		Action: "PATCH",
 		Pretty: true,
